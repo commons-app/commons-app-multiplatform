@@ -1,4 +1,4 @@
-package com.app.commons
+package app.multiplatform.commons
 
 class Greeting {
     private val platform = getPlatform()

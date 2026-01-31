@@ -1,4 +1,4 @@
-package com.app.commons
+package app.multiplatform.commons
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

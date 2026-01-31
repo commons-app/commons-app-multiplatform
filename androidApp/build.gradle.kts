@@ -26,11 +26,11 @@ kotlin {
 }
 
 android {
-    namespace = "com.app.commons"
+    namespace = "app.multiplatform.commons"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.app.commons"
+        applicationId = "app.multiplatform.commons"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

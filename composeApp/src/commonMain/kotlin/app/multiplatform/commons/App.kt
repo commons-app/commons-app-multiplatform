@@ -1,4 +1,4 @@
-package com.app.commons
+package app.multiplatform.commons
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image

@@ -1,4 +1,4 @@
-package com.app.commons
+package app.multiplatform.commons
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

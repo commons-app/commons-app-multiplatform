@@ -1,4 +1,4 @@
-package com.app.commons
+package app.multiplatform.commons
 
 interface Platform {
     val name: String
