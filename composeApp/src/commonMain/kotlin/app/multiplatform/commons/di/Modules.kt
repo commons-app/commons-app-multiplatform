@@ -4,6 +4,7 @@ import app.multiplatform.commons.auth.data.AuthApi
 import app.multiplatform.commons.auth.data.AuthRepositoryImpl
 import app.multiplatform.commons.auth.domain.AuthRepository
 import app.multiplatform.commons.auth.ui.AuthViewModel
+import app.multiplatform.commons.upload.ui.UploadViewModel
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
@@ -16,6 +17,7 @@ val sharedModule = module {
     single { AuthApi(get()) }
     single<AuthRepository> { AuthRepositoryImpl(get()) }
     viewModel { AuthViewModel(get()) }
+    viewModel { UploadViewModel() }
 }
 
 fun initKoin(config: KoinAppDeclaration? = null) {

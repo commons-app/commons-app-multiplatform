@@ -12,6 +12,8 @@ import app.multiplatform.commons.auth.ui.AuthViewModel
 import app.multiplatform.commons.home.ui.HomeScreen
 import app.multiplatform.commons.theme.WikimediaTheme
 import app.multiplatform.commons.theme.platformThemeTarget
+import app.multiplatform.commons.upload.ui.UploadScreen
+import app.multiplatform.commons.upload.ui.UploadViewModel
 import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveTheme
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
@@ -22,6 +24,8 @@ sealed interface Route {
     data object Auth : Route
     @Serializable
     data object Home : Route
+    @Serializable
+    data object Upload : Route
 }
 
 @Composable
@@ -48,7 +52,19 @@ fun App() {
                     )
                 }
                 Route.Home -> {
-                    HomeScreen()
+                    HomeScreen(
+                        onNavigateToUpload = { backstack.add(Route.Upload) }
+                    )
+                }
+                Route.Upload -> {
+                    val uploadViewModel = koinViewModel<UploadViewModel>()
+                    val uiState by uploadViewModel.uiState.collectAsStateWithLifecycle()
+
+                    UploadScreen(
+                        uiState = uiState,
+                        onEvent = uploadViewModel::onEvent,
+                        onNavigateBack = { backstack.removeLastOrNull() }
+                    )
                 }
             }
         }
