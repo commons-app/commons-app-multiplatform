@@ -16,6 +16,7 @@ kotlin = "2.3.21"
 kotlinx-serialization = "1.11.0"
 koinBom = "4.2.1"
 material3 = "1.10.0-alpha05"
+cupertino = "0.1.0-alpha04"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -36,6 +37,10 @@ compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "composeMul
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
 compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+
+# Compose Cupertino
+cupertino-adaptive = { module = "io.github.alexzhirkevich:cupertino-adaptive", version.ref = "cupertino" }
+cupertino-core = { module = "io.github.alexzhirkevich:cupertino", version.ref = "cupertino" }
 
 # Koin DI
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koinBom" }

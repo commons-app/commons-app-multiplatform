@@ -1,6 +1,5 @@
 package app.multiplatform.commons
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -11,6 +10,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.multiplatform.commons.auth.ui.AuthScreen
 import app.multiplatform.commons.auth.ui.AuthViewModel
 import app.multiplatform.commons.home.ui.HomeScreen
+import app.multiplatform.commons.theme.platformThemeTarget
+import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveTheme
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -25,7 +26,7 @@ sealed interface Route {
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
+    AdaptiveTheme(target = platformThemeTarget()) {
         Surface {
             val backstack = remember { mutableStateListOf<Route>(Route.Auth) }
 
