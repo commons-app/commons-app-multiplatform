@@ -3,6 +3,7 @@ package app.multiplatform.commons.auth.data
 import app.multiplatform.commons.auth.data.dto.LoginResponseDto
 import app.multiplatform.commons.auth.domain.AuthRepository
 import app.multiplatform.commons.auth.domain.models.ClientLoginResult
+import app.multiplatform.commons.auth.domain.models.TwoFactorType
 import app.multiplatform.commons.model.DataError
 import app.multiplatform.commons.model.Result
 import app.multiplatform.commons.utils.Constants
@@ -11,7 +12,6 @@ import io.ktor.client.call.body
 class AuthRepositoryImpl(
     private val authApi: AuthApi
 ) : AuthRepository {
-    private var loginToken: String? = null
 
     override suspend fun login(username: String, password: String): Result<ClientLoginResult, DataError.NetworkError> {
         return try {
@@ -19,20 +19,32 @@ class AuthRepositoryImpl(
             val token = tokenResponse.query?.loginToken() 
                 ?: return Result.Error(DataError.NetworkError.SERVER_ERROR)
 
-            loginToken = token
-
             val loginResponse = authApi.postLogin(
                 username = username,
                 password = password,
                 token = token,
-                userLanguage = "en", // TODO("Replace with user's preferred locale")
+                userLanguage = "en",
                 loginReturnUrl = Constants.WIKIPEDIA_URL
             )
 
             return when(loginResponse.status.value) {
                 in 200..299 -> {
                     val responseBody = loginResponse.body<LoginResponseDto>()
-                    Result.Success(ClientLoginResult(responseBody.clientlogin?.status, responseBody.clientlogin?.message))
+                    val twoFactorType = responseBody.clientlogin?.requests
+                        ?.firstNotNullOfOrNull { req ->
+                            when {
+                                req.id?.endsWith("TOTPAuthenticationRequest") == true -> TwoFactorType.TOTP
+                                req.id?.endsWith("EmailAuthAuthenticationRequest") == true -> TwoFactorType.EMAIL
+                                else -> null
+                            }
+                        }
+                    Result.Success(
+                        ClientLoginResult(
+                            status = responseBody.clientlogin?.status,
+                            message = responseBody.clientlogin?.message,
+                            twoFactorType = twoFactorType,
+                        )
+                    )
                 }
                 400 -> Result.Error(DataError.NetworkError.BAD_REQUEST)
                 409 -> Result.Error(DataError.NetworkError.CONFLICT)
@@ -48,17 +60,24 @@ class AuthRepositoryImpl(
     override suspend fun loginWithTwoFactorCode(
         username: String,
         password: String,
-        twoFactorCode: String
+        twoFactorCode: String,
+        twoFactorType: TwoFactorType,
     ): Result<ClientLoginResult, DataError.NetworkError> {
         return try {
+            // Fetch a fresh loginToken; same session cookie keeps the auth state alive.
+            val tokenResponse = authApi.getLoginToken()
+            val freshToken = tokenResponse.query?.loginToken()
+                ?: return Result.Error(DataError.NetworkError.SERVER_ERROR)
+
             val loginResponse = authApi.postLogin(
                 user = username,
                 pass = password,
                 retypedPass = null,
-                twoFactorCode = twoFactorCode,
-                emailAuthToken = null,
-                loginToken = loginToken,
-                userLanguage = "en", // TODO("Replace with user's preferred locale")
+                // TOTP (e.g. Google Authenticator) uses OATHToken; email-based auth uses token.
+                twoFactorCode = if (twoFactorType == TwoFactorType.TOTP) twoFactorCode else null,
+                emailAuthToken = twoFactorCode,
+                loginToken = freshToken,
+                userLanguage = "en",
                 loginContinue = true
             )
 

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.multiplatform.commons.auth.domain.AuthRepository
 import app.multiplatform.commons.auth.domain.models.LoginStatus
+import app.multiplatform.commons.auth.domain.models.TwoFactorType
 import app.multiplatform.commons.model.DataError.*
 import app.multiplatform.commons.model.Result
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,8 +44,11 @@ class AuthViewModel(
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-            val result = if (uiState.value.twoFactorAuthCode.isNotBlank()) {
-                authRepository.loginWithTwoFactorCode(username, password, uiState.value.twoFactorAuthCode)
+
+            val state = uiState.value
+            val result = if (state.shouldShowTwoFactorAuthState && state.twoFactorAuthCode.isNotBlank()) {
+                val twoFactorType = state.twoFactorType ?: TwoFactorType.TOTP
+                authRepository.loginWithTwoFactorCode(username, password, state.twoFactorAuthCode, twoFactorType)
             } else {
                 authRepository.login(username, password)
             }
@@ -58,7 +62,13 @@ class AuthViewModel(
                             _uiState.update { it.copy(isLoading = false, error = result.data.message) }
                         }
                         LoginStatus.UI -> {
-                            _uiState.update { it.copy(isLoading = false, shouldShowTwoFactorAuthState = true) }
+                            _uiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    shouldShowTwoFactorAuthState = true,
+                                    twoFactorType = result.data.twoFactorType,
+                                )
+                            }
                         }
                         LoginStatus.RESTART -> {
                             _uiState.update { it.copy(isLoading = false, error = result.data.message) }
@@ -82,7 +92,7 @@ class AuthViewModel(
             }
         }
     }
-    
+
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
     }
