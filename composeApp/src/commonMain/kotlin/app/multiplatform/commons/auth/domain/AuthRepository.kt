@@ -6,5 +6,5 @@ import app.multiplatform.commons.model.Result
 
 interface AuthRepository {
     suspend fun login(username: String, password: String): Result<ClientLoginResult, DataError.NetworkError>
-    suspend fun loginWithTwoFactorCode(username: String, password: String, twoFactorCode: String): Result<Unit, DataError.NetworkError>
+    suspend fun loginWithTwoFactorCode(username: String, password: String, twoFactorCode: String): Result<ClientLoginResult, DataError.NetworkError>
 }

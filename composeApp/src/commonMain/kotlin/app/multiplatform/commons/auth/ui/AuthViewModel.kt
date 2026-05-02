@@ -43,7 +43,12 @@ class AuthViewModel(
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-            when (val result = authRepository.login(username, password)) {
+            val result = if (uiState.value.twoFactorAuthCode.isNotBlank()) {
+                authRepository.loginWithTwoFactorCode(username, password, uiState.value.twoFactorAuthCode)
+            } else {
+                authRepository.login(username, password)
+            }
+            when (result) {
                 is Result.Success -> {
                     when (result.data.status) {
                         LoginStatus.PASS -> {

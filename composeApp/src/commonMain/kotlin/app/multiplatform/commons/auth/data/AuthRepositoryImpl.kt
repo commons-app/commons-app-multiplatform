@@ -11,11 +11,15 @@ import io.ktor.client.call.body
 class AuthRepositoryImpl(
     private val authApi: AuthApi
 ) : AuthRepository {
+    private var loginToken: String? = null
+
     override suspend fun login(username: String, password: String): Result<ClientLoginResult, DataError.NetworkError> {
         return try {
             val tokenResponse = authApi.getLoginToken()
             val token = tokenResponse.query?.loginToken() 
                 ?: return Result.Error(DataError.NetworkError.SERVER_ERROR)
+
+            loginToken = token
 
             val loginResponse = authApi.postLogin(
                 username = username,
@@ -45,7 +49,38 @@ class AuthRepositoryImpl(
         username: String,
         password: String,
         twoFactorCode: String
-    ): Result<Unit, DataError.NetworkError> {
-        TODO("Not yet implemented")
+    ): Result<ClientLoginResult, DataError.NetworkError> {
+        return try {
+            val loginResponse = authApi.postLogin(
+                user = username,
+                pass = password,
+                retypedPass = null,
+                twoFactorCode = twoFactorCode,
+                emailAuthToken = null,
+                loginToken = loginToken,
+                userLanguage = "en", // TODO("Replace with user's preferred locale")
+                loginContinue = true
+            )
+
+            return when (loginResponse.status.value) {
+                in 200..299 -> {
+                    val responseBody = loginResponse.body<LoginResponseDto>()
+                    Result.Success(
+                        ClientLoginResult(
+                            responseBody.clientlogin?.status,
+                            responseBody.clientlogin?.message
+                        )
+                    )
+                }
+                400 -> Result.Error(DataError.NetworkError.BAD_REQUEST)
+                401 -> Result.Error(DataError.NetworkError.UNAUTHORIZED)
+                409 -> Result.Error(DataError.NetworkError.CONFLICT)
+                429 -> Result.Error(DataError.NetworkError.TOO_MANY_REQUESTS)
+                in 500..599 -> Result.Error(DataError.NetworkError.SERVER_ERROR)
+                else -> Result.Error(DataError.NetworkError.UNKNOWN)
+            }
+        } catch (e: Exception) {
+            Result.Error(DataError.NetworkError.UNKNOWN)
+        }
     }
 }
