@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "PowerShell(ls -Path \"C:\\\\Users\\\\josep\\\\.gradle\\\\caches\\\\9.1.0\\\\modules-2\\\\files-2.1\\\\io.github.alexzhirkevich\" -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.Name -match \"cupertino\" })",
-      "PowerShell(\\(Get-ChildItem \"C:\\\\Users\\\\josep\\\\.gradle\\\\caches\" | Measure-Object\\).Count)",
-      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\josep\\\\.gradle\\\\caches\" | ForEach-Object { $_.Name })"
-    ]
-  }
-}
