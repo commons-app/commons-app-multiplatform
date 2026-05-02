@@ -2,10 +2,12 @@ package app.multiplatform.commons.auth.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -35,10 +37,12 @@ fun AuthScreen(
         }
     }
 
+    var passwordVisible by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(horizontal = 24.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -46,13 +50,13 @@ fun AuthScreen(
             painter = painterResource(Res.drawable.commons_logo),
             contentDescription = "Wikimedia Commons logo",
             modifier = Modifier
-                .size(80.dp)
                 .padding(bottom = 16.dp)
+                .size(80.dp)
         )
 
         Text(
-            text = "Login to Commons",
-            style = MaterialTheme.typography.headlineMedium,
+            text = "Wikimedia Commons",
+            style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(bottom = 32.dp)
         )
 
@@ -69,7 +73,8 @@ fun AuthScreen(
                 value = uiState.username,
                 onValueChange = { onEvent(AuthEvent.OnUsernameChanged(it)) },
                 label = "Username",
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
 
             AdaptiveOutlinedTextField(
@@ -77,7 +82,19 @@ fun AuthScreen(
                 onValueChange = { onEvent(AuthEvent.OnPasswordChanged(it)) },
                 label = "Password",
                 modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation()
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                trailingIcon = {
+                    TextButton(
+                        onClick = { passwordVisible = !passwordVisible },
+                        contentPadding = PaddingValues(horizontal = 8.dp)
+                    ) {
+                        Text(
+                            text = if (passwordVisible) "Hide" else "Show",
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                }
             )
 
             if (uiState.shouldShowTwoFactorAuthState) {
@@ -85,7 +102,8 @@ fun AuthScreen(
                     value = uiState.twoFactorAuthCode,
                     onValueChange = { onEvent(AuthEvent.OnTwoFactorAuthCodeChanged(it)) },
                     label = "OTP",
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
                 )
             }
         }
@@ -97,7 +115,9 @@ fun AuthScreen(
         } else {
             AdaptiveButton(
                 onClick = { onEvent(AuthEvent.OnLoginClicked) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
             ) {
                 Text("Login")
             }
@@ -113,6 +133,8 @@ private fun AdaptiveOutlinedTextField(
     label: String,
     modifier: Modifier = Modifier,
     visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     AdaptiveWidget(
         material = {
@@ -122,7 +144,9 @@ private fun AdaptiveOutlinedTextField(
                 label = { Text(label) },
                 modifier = modifier,
                 singleLine = true,
-                visualTransformation = visualTransformation
+                visualTransformation = visualTransformation,
+                keyboardOptions = keyboardOptions,
+                trailingIcon = trailingIcon
             )
         },
         cupertino = {
@@ -132,7 +156,9 @@ private fun AdaptiveOutlinedTextField(
                 placeholder = { Text(label) },
                 modifier = modifier,
                 singleLine = true,
-                visualTransformation = visualTransformation
+                visualTransformation = visualTransformation,
+                keyboardOptions = keyboardOptions,
+                trailingIcon = trailingIcon
             )
         }
     )
