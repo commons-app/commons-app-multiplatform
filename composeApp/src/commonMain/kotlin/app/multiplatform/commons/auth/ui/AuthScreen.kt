@@ -14,8 +14,14 @@ import androidx.compose.ui.unit.dp
 fun AuthScreen(
     uiState: AuthUiState,
     onEvent: (AuthEvent) -> Unit,
-    onLoginSuccess: (String) -> Unit
+    onLoginSuccess: () -> Unit
 ) {
+    LaunchedEffect(uiState.isLoggedInSuccess) {
+        if(uiState.isLoggedInSuccess) {
+            onLoginSuccess()
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()

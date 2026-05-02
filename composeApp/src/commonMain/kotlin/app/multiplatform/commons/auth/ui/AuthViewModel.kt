@@ -53,7 +53,7 @@ class AuthViewModel(
                             _uiState.update { it.copy(isLoading = false, error = result.data.message) }
                         }
                         LoginStatus.UI -> {
-                            _uiState.update { it.copy(shouldShowTwoFactorAuthState = true) }
+                            _uiState.update { it.copy(isLoading = false, shouldShowTwoFactorAuthState = true) }
                         }
                         LoginStatus.RESTART -> {
                             _uiState.update { it.copy(isLoading = false, error = result.data.message) }
