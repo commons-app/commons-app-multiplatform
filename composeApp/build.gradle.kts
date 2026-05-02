@@ -53,6 +53,9 @@ kotlin {
             implementation(libs.koin.compose.viewmodel.navigation)
             implementation(libs.koin.compose.navigation3)
 
+            implementation(libs.cupertino.adaptive)
+            implementation(libs.cupertino.core)
+
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)

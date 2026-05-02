@@ -1,15 +1,28 @@
 package app.multiplatform.commons.auth.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import app.multiplatform.commons.theme.platformThemeTarget
+import commons.composeapp.generated.resources.Res
+import commons.composeapp.generated.resources.commons_logo
+import io.github.alexzhirkevich.cupertino.CupertinoTextField
+import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveButton
+import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveCircularProgressIndicator
+import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveTheme
+import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveWidget
+import io.github.alexzhirkevich.cupertino.adaptive.ExperimentalAdaptiveApi
+import org.jetbrains.compose.resources.painterResource
 
+@OptIn(ExperimentalAdaptiveApi::class)
 @Composable
 fun AuthScreen(
     uiState: AuthUiState,
@@ -17,7 +30,7 @@ fun AuthScreen(
     onLoginSuccess: () -> Unit
 ) {
     LaunchedEffect(uiState.isLoggedInSuccess) {
-        if(uiState.isLoggedInSuccess) {
+        if (uiState.isLoggedInSuccess) {
             onLoginSuccess()
         }
     }
@@ -29,6 +42,14 @@ fun AuthScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Image(
+            painter = painterResource(Res.drawable.commons_logo),
+            contentDescription = "Wikimedia Commons logo",
+            modifier = Modifier
+                .size(80.dp)
+                .padding(bottom = 16.dp)
+        )
+
         Text(
             text = "Login to Commons",
             style = MaterialTheme.typography.headlineMedium,
@@ -40,37 +61,31 @@ fun AuthScreen(
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(vertical = 16.dp)
+            modifier = Modifier.padding(vertical = 16.dp)
         )
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            OutlinedTextField(
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            AdaptiveOutlinedTextField(
                 value = uiState.username,
                 onValueChange = { onEvent(AuthEvent.OnUsernameChanged(it)) },
-                label = { Text("Username") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                label = "Username",
+                modifier = Modifier.fillMaxWidth()
             )
 
-            OutlinedTextField(
+            AdaptiveOutlinedTextField(
                 value = uiState.password,
                 onValueChange = { onEvent(AuthEvent.OnPasswordChanged(it)) },
-                label = { Text("Password") },
+                label = "Password",
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
                 visualTransformation = PasswordVisualTransformation()
             )
 
-            if(uiState.shouldShowTwoFactorAuthState) {
-                OutlinedTextField(
+            if (uiState.shouldShowTwoFactorAuthState) {
+                AdaptiveOutlinedTextField(
                     value = uiState.twoFactorAuthCode,
                     onValueChange = { onEvent(AuthEvent.OnTwoFactorAuthCodeChanged(it)) },
-                    label = { Text("OTP") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
+                    label = "OTP",
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
@@ -78,9 +93,9 @@ fun AuthScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         if (uiState.isLoading) {
-            CircularProgressIndicator()
+            AdaptiveCircularProgressIndicator()
         } else {
-            Button(
+            AdaptiveButton(
                 onClick = { onEvent(AuthEvent.OnLoginClicked) },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -90,10 +105,43 @@ fun AuthScreen(
     }
 }
 
+@OptIn(ExperimentalAdaptiveApi::class)
+@Composable
+private fun AdaptiveOutlinedTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+) {
+    AdaptiveWidget(
+        material = {
+            OutlinedTextField(
+                value = value,
+                onValueChange = onValueChange,
+                label = { Text(label) },
+                modifier = modifier,
+                singleLine = true,
+                visualTransformation = visualTransformation
+            )
+        },
+        cupertino = {
+            CupertinoTextField(
+                value = value,
+                onValueChange = onValueChange,
+                placeholder = { Text(label) },
+                modifier = modifier,
+                singleLine = true,
+                visualTransformation = visualTransformation
+            )
+        }
+    )
+}
+
 @Preview
 @Composable
 fun AuthScreenPreview() {
-    MaterialTheme {
+    AdaptiveTheme(target = platformThemeTarget()) {
         Surface {
             AuthScreen(
                 uiState = AuthUiState(
