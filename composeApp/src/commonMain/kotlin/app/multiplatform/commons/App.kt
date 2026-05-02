@@ -10,8 +10,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.multiplatform.commons.auth.ui.AuthScreen
 import app.multiplatform.commons.auth.ui.AuthViewModel
 import app.multiplatform.commons.home.ui.HomeScreen
+import app.multiplatform.commons.theme.WikimediaTheme
 import app.multiplatform.commons.theme.platformThemeTarget
-import androidx.compose.material3.MaterialTheme
 import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveTheme
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
@@ -29,7 +29,7 @@ sealed interface Route {
 fun App() {
     AdaptiveTheme(
         target = platformThemeTarget(),
-        material = { MaterialTheme(content = it) }
+        material = { WikimediaTheme(content = it) }
     ) {
         Surface {
             val backstack = remember { mutableStateListOf<Route>(Route.Auth) }
