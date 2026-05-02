@@ -141,7 +141,10 @@ private fun AdaptiveOutlinedTextField(
 @Preview
 @Composable
 fun AuthScreenPreview() {
-    AdaptiveTheme(target = platformThemeTarget()) {
+    AdaptiveTheme(
+        target = platformThemeTarget(),
+        material = { MaterialTheme(content = it) }
+    ) {
         Surface {
             AuthScreen(
                 uiState = AuthUiState(
