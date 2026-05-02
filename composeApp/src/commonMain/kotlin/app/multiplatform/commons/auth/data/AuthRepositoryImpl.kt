@@ -23,7 +23,7 @@ class AuthRepositoryImpl(
                 username = username,
                 password = password,
                 token = token,
-                userLanguage = "en",
+                userLanguage = "en", // TODO("Replace with user's preferred locale")
                 loginReturnUrl = Constants.WIKIPEDIA_URL
             )
 
@@ -75,7 +75,7 @@ class AuthRepositoryImpl(
                 retypedPass = null,
                 // TOTP (e.g. Google Authenticator) uses OATHToken; email-based auth uses token.
                 twoFactorCode = if (twoFactorType == TwoFactorType.TOTP) twoFactorCode else null,
-                emailAuthToken = twoFactorCode,
+                emailAuthToken = if (twoFactorType == TwoFactorType.EMAIL) twoFactorCode else null,
                 loginToken = freshToken,
                 userLanguage = "en",
                 loginContinue = true
