@@ -12,13 +12,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveTheme
-import io.github.alexzhirkevich.cupertino.adaptive.CupertinoThemeSpec
-import io.github.alexzhirkevich.cupertino.adaptive.ExperimentalAdaptiveApi
-import io.github.alexzhirkevich.cupertino.adaptive.MaterialThemeSpec
-import io.github.alexzhirkevich.cupertino.adaptive.Theme
-import io.github.alexzhirkevich.cupertino.theme.Typography as CupertinoTypography
-import io.github.alexzhirkevich.cupertino.theme.lightColorScheme as cupertinoLightColorScheme
+import io.github.robinpcrd.cupertino.adaptive.AdaptiveTheme
+import io.github.robinpcrd.cupertino.adaptive.CupertinoThemeSpec
+import io.github.robinpcrd.cupertino.adaptive.ExperimentalAdaptiveApi
+import io.github.robinpcrd.cupertino.adaptive.MaterialThemeSpec
+import io.github.robinpcrd.cupertino.adaptive.Theme
+import io.github.robinpcrd.cupertino.theme.Typography as CupertinoTypography
+import io.github.robinpcrd.cupertino.theme.lightColorScheme as cupertinoLightColorScheme
 
 // Codex colour tokens — https://doc.wikimedia.org/codex/latest/design-tokens/color.html
 private val Blue700  = Color(0xFF3366CC) // progressive / primary
