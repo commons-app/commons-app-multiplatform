@@ -17,5 +17,6 @@ interface AuthRepository {
     suspend fun getCsrfToken(): String?
 
     fun isLoggedIn(): Boolean
+    fun getUsername(): String?
     fun logout()
 }

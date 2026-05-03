@@ -4,6 +4,10 @@ import app.multiplatform.commons.auth.data.AuthApi
 import app.multiplatform.commons.auth.data.AuthRepositoryImpl
 import app.multiplatform.commons.auth.domain.AuthRepository
 import app.multiplatform.commons.auth.ui.AuthViewModel
+import app.multiplatform.commons.home.data.ContributionsRepositoryImpl
+import app.multiplatform.commons.home.domain.ContributionsRepository
+import app.multiplatform.commons.home.ui.HomeViewModel
+import app.multiplatform.commons.upload.data.MediaApi
 import app.multiplatform.commons.upload.data.PageContentsCreator
 import app.multiplatform.commons.upload.data.UploadApi
 import app.multiplatform.commons.upload.ui.UploadViewModel
@@ -22,11 +26,14 @@ val sharedModule = module {
     single { Settings() }
     single { AuthApi(get()) }
     single { UploadApi(get()) }
+    single { MediaApi(get()) }
     single { PageContentsCreator() }
     single<AuthRepository> { AuthRepositoryImpl(get(), get()) }
     single<UploadRepository> { UploadRepositoryImpl(get(), get(), get()) }
+    single<ContributionsRepository> { ContributionsRepositoryImpl(get(), get()) }
     viewModel { AuthViewModel(get()) }
     viewModel { UploadViewModel(get(), get()) }
+    viewModel { HomeViewModel(get()) }
 }
 
 fun initKoin(config: KoinAppDeclaration? = null) {
