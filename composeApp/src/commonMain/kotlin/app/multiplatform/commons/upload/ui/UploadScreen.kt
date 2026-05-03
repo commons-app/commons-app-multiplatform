@@ -22,13 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -52,7 +46,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import commons.composeapp.generated.resources.Res
+import commons.composeapp.generated.resources.ic_cdx_check
+import commons.composeapp.generated.resources.ic_cdx_expand
+import commons.composeapp.generated.resources.ic_cdx_previous
 import kotlin.math.roundToInt
+import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,14 +75,10 @@ fun UploadScreen(
                 navigationIcon = {
                     if (uiState.phase == UploadPhase.DETAILS) {
                         IconButton(onClick = onNavigateBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            Icon(painterResource(Res.drawable.ic_cdx_previous), contentDescription = "Back")
                         }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                )
             )
         }
     ) { innerPadding ->
@@ -159,7 +154,6 @@ private fun DetailsContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
-            shape = RoundedCornerShape(12.dp),
         ) {
             Text("Start Upload", style = MaterialTheme.typography.labelLarge)
         }
@@ -172,12 +166,12 @@ private fun ImagePreviewPlaceholder() {
         modifier = Modifier
             .fillMaxWidth()
             .height(200.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .clip(MaterialTheme.shapes.large)
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.outline,
-                shape = RoundedCornerShape(16.dp)
+                shape = MaterialTheme.shapes.large
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -200,7 +194,7 @@ private fun LicensePicker(
         OutlinedCard(
             onClick = onToggle,
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
+            shape = MaterialTheme.shapes.medium,
         ) {
             Row(
                 modifier = Modifier
@@ -221,7 +215,7 @@ private fun LicensePicker(
                     )
                 }
                 Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
+                    painter = painterResource(Res.drawable.ic_cdx_expand),
                     contentDescription = "Choose license",
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -274,7 +268,7 @@ private fun ProgressContent(
             Button(
                 onClick = onNavigateBack,
                 modifier = Modifier.fillMaxWidth().height(52.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = MaterialTheme.shapes.medium,
             ) {
                 Text("Done", style = MaterialTheme.typography.labelLarge)
             }
@@ -282,7 +276,7 @@ private fun ProgressContent(
             FilledTonalButton(
                 onClick = { onEvent(UploadEvent.OnCancelUpload) },
                 modifier = Modifier.fillMaxWidth().height(52.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = MaterialTheme.shapes.medium,
             ) {
                 Text("Cancel", style = MaterialTheme.typography.labelLarge)
             }
@@ -298,7 +292,7 @@ private fun UploadProgressCard(
 ) {
     OutlinedCard(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.large,
     ) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(20.dp),
@@ -311,7 +305,7 @@ private fun UploadProgressCard(
                 Box(
                     modifier = Modifier
                         .size(52.dp)
-                        .clip(RoundedCornerShape(10.dp))
+                        .clip(MaterialTheme.shapes.small)
                         .background(MaterialTheme.colorScheme.surfaceVariant),
                 )
 
@@ -331,7 +325,7 @@ private fun UploadProgressCard(
 
                 if (isComplete) {
                     Icon(
-                        imageVector = Icons.Default.Done,
+                        painter = painterResource(Res.drawable.ic_cdx_check),
                         contentDescription = "Complete",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(28.dp),
@@ -345,7 +339,7 @@ private fun UploadProgressCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp)
-                        .clip(RoundedCornerShape(4.dp)),
+                        .clip(MaterialTheme.shapes.extraSmall),
                     strokeCap = StrokeCap.Round,
                 )
                 Row(
