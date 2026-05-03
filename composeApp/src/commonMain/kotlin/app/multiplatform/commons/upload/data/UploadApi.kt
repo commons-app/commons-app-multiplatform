@@ -104,4 +104,29 @@ class UploadApi(private val client: HttpClient) {
             header("Cache-Control", "no-cache")
         }.body()
     }
+
+    /**
+     * Sets the structured-data caption (WikiBase label) for a file on Commons.
+     * Equivalent to PageEditInterface.postCaptions in the Android app.
+     * [title] must be the canonical form, e.g. "File:Example.jpg".
+     */
+    suspend fun setCaption(
+        token: String,
+        title: String,
+        language: String,
+        value: String,
+    ): JsonObject {
+        return client.submitForm(
+            url = "${MW_API_PREFIX}&action=wbsetlabel&site=commonswiki",
+            formParameters = parameters {
+                append("token", token)
+                append("title", title)
+                append("language", language)
+                append("value", value)
+                append("summary", "Adding caption")
+            }
+        ) {
+            header("Cache-Control", "no-cache")
+        }.body()
+    }
 }

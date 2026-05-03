@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -38,14 +37,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -73,20 +74,29 @@ fun UploadScreen(
     onNavigateBack: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    var selectedImageBytes by remember { mutableStateOf<ByteArray?>(null) }
-    val imageBitmap = remember(selectedImageBytes) {
-        selectedImageBytes?.toImageBitmap()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val imageBitmap = remember(uiState.selectedImageBytes) {
+        uiState.selectedImageBytes?.toImageBitmap()
     }
 
     val pickerLauncher = rememberImagePickerLauncher(
         selectionMode = SelectionMode.Single,
         scope = scope,
         onResult = { byteArrays ->
-            selectedImageBytes = byteArrays.firstOrNull()
+            byteArrays.firstOrNull()?.let { onEvent(UploadEvent.OnImageSelected(it)) }
         }
     )
 
+    // Show upload error in snackbar
+    LaunchedEffect(uiState.uploadError) {
+        uiState.uploadError?.let {
+            snackbarHostState.showSnackbar(it)
+            onEvent(UploadEvent.OnDismissError)
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) { Snackbar(it) } },
         topBar = {
             TopAppBar(
                 title = {
@@ -121,15 +131,14 @@ fun UploadScreen(
                 UploadPhase.DETAILS -> DetailsContent(
                     uiState = uiState,
                     onEvent = onEvent,
-                    onSelectImage = {
-                        pickerLauncher.launch()
-                    },
-                    imageBitmap
+                    onSelectImage = { pickerLauncher.launch() },
+                    imageBitmap = imageBitmap,
                 )
                 UploadPhase.UPLOADING, UploadPhase.COMPLETE -> ProgressContent(
                     uiState = uiState,
                     onEvent = onEvent,
                     onNavigateBack = onNavigateBack,
+                    imageBitmap = imageBitmap,
                 )
             }
         }
@@ -151,15 +160,18 @@ private fun DetailsContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         if (imageBitmap != null) {
-            Image(
-                bitmap = imageBitmap,
-                contentDescription = "Selected Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .clip(RoundedCornerShape(16.dp))
-            )
+            Card(
+                onClick = onSelectImage,
+                modifier = Modifier.fillMaxWidth().height(200.dp),
+                shape = MaterialTheme.shapes.large,
+            ) {
+                Image(
+                    bitmap = imageBitmap,
+                    contentDescription = "Selected image — tap to change",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
         } else {
             ImagePreviewPlaceholder(onSelectImage)
         }
@@ -296,6 +308,7 @@ private fun ProgressContent(
     uiState: UploadUiState,
     onEvent: (UploadEvent) -> Unit,
     onNavigateBack: () -> Unit,
+    imageBitmap: ImageBitmap? = null,
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = uiState.uploadProgress,
@@ -318,6 +331,7 @@ private fun ProgressContent(
             caption = uiState.caption,
             progress = animatedProgress,
             isComplete = isComplete,
+            imageBitmap = imageBitmap,
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -347,6 +361,7 @@ private fun UploadProgressCard(
     caption: String,
     progress: Float,
     isComplete: Boolean,
+    imageBitmap: ImageBitmap? = null,
 ) {
     OutlinedCard(
         modifier = Modifier.fillMaxWidth(),
@@ -360,12 +375,23 @@ private fun UploadProgressCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(52.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                )
+                if (imageBitmap != null) {
+                    Image(
+                        bitmap = imageBitmap,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(52.dp)
+                            .clip(MaterialTheme.shapes.small),
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(52.dp)
+                            .clip(MaterialTheme.shapes.small)
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                    )
+                }
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(

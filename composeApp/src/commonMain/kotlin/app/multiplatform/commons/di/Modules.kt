@@ -26,7 +26,7 @@ val sharedModule = module {
     single<AuthRepository> { AuthRepositoryImpl(get(), get()) }
     single<UploadRepository> { UploadRepositoryImpl(get(), get(), get()) }
     viewModel { AuthViewModel(get()) }
-    viewModel { UploadViewModel() }
+    viewModel { UploadViewModel(get(), get()) }
 }
 
 fun initKoin(config: KoinAppDeclaration? = null) {

@@ -15,7 +15,6 @@ class UploadRepositoryImpl(
     private val authRepository: AuthRepository,
     private val pageContentsCreator: PageContentsCreator,
 ): UploadRepository {
-    private val chunkSize = 512 * 1024 // 512 KB
 
     /**
      * This is maximum duration for which a stash is persisted on MediaWiki
@@ -23,7 +22,7 @@ class UploadRepositoryImpl(
     */
     private val maxChunkAge = 6 * 3600 * 1000 // 6 hours
 
-    override fun uploadFileToStash(filename: String, ): Flow<StashUploadResult> = flow {
+    override fun uploadFileToStash(filename: String): Flow<StashUploadResult> = flow {
         TODO("Not yet implemented")
     }
 
@@ -48,7 +47,7 @@ class UploadRepositoryImpl(
             ?: throw IllegalStateException("Could not fetch CSRF token")
 
         try {
-            uploadApi.uploadFileToCommons(
+            val response = uploadApi.uploadFileToCommons(
                 filename = filename,
                 fileBytes = fileBytes,
                 mimeType = mimeType,
@@ -57,6 +56,44 @@ class UploadRepositoryImpl(
                 comment = Constants.DEFAULT_EDIT_SUMMARY,
                 onProgress = onProgress
             )
+
+            response.firstError()?.let { msg ->
+                throw IllegalStateException("Upload API error: $msg")
+            }
+
+            val uploadData = response.upload
+                ?: throw IllegalStateException("Upload returned no data — full response: $response")
+
+            // Duplicate-content check: the server still notifies us via warnings.duplicate
+            // even when ignorewarnings=1 is set on some MediaWiki versions.
+            uploadData.warnings?.duplicate
+                ?.takeIf { it.isNotEmpty() }
+                ?.let { dupes ->
+                    throw IllegalStateException(
+                        "File already exists on Commons as: ${dupes.joinToString()}"
+                    )
+                }
+
+            if (!uploadData.isSuccessful()) {
+                throw IllegalStateException(
+                    "Upload did not succeed (result=${uploadData.result})"
+                )
+            }
+
+            if (contribution.caption.isNotBlank()) {
+                try {
+                    val freshToken = authRepository.getCsrfToken()
+                        ?: throw IllegalStateException("Could not fetch CSRF token for caption")
+                    uploadApi.setCaption(
+                        token = freshToken,
+                        title = uploadData.createCanonicalFileName(),
+                        language = "en",
+                        value = contribution.caption,
+                    )
+                } catch (e: Exception) {
+                    Napier.w("Caption upload failed (file was still uploaded)", e)
+                }
+            }
         } catch (e: Exception) {
             Napier.e("Failed to upload file to Commons", e)
             throw e

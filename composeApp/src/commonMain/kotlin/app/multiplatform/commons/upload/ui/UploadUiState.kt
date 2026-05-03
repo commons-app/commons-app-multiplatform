@@ -9,12 +9,13 @@ data class UploadUiState(
     val uploadProgress: Float = 0f,
     val captionError: String? = null,
     val uploadError: String? = null,
+    val selectedImageBytes: ByteArray? = null,
 )
 
 enum class UploadPhase { DETAILS, UPLOADING, COMPLETE }
 
-enum class UploadLicense(val label: String) {
-    CC_BY_SA_4("CC BY-SA 4.0"),
-    CC_BY_4("CC BY 4.0"),
-    CC0("CC0 1.0 (Public Domain)"),
+enum class UploadLicense(val label: String, val wikiTemplate: String) {
+    CC_BY_SA_4("CC BY-SA 4.0", "{{self|cc-by-sa-4.0}}"),
+    CC_BY_4("CC BY 4.0", "{{self|cc-by-4.0}}"),
+    CC0("CC0 1.0 (Public Domain)", "{{self|cc-zero}}"),
 }
