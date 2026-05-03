@@ -10,6 +10,7 @@ import app.multiplatform.commons.model.Result
 import app.multiplatform.commons.utils.Constants
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.set
+import io.github.aakira.napier.Napier
 import io.ktor.client.call.body
 
 class AuthRepositoryImpl(
@@ -114,7 +115,12 @@ class AuthRepositoryImpl(
     }
 
     override suspend fun getCsrfToken(): String? {
-        TODO("Not yet implemented")
+        return try {
+            authApi.getCsrfToken().query?.tokens?.csrftoken
+        } catch (e: Exception) {
+            Napier.e("Failed to get CSRF token", e)
+            null
+        }
     }
 
     override fun isLoggedIn(): Boolean {
