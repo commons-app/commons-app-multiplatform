@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -39,6 +40,10 @@ fun HomeScreen(
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.fetchContributions()
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -50,6 +55,8 @@ fun HomeScreen(
                 onClick = { pickerLauncher.launch() },
                 icon = {Icon(painterResource(Res.drawable.ic_cdx_add), contentDescription = "Upload") },
                 text = { Text("Upload") },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             )
         }
     ) { innerPadding ->
