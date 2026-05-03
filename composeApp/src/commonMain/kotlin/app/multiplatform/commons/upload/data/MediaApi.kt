@@ -26,7 +26,14 @@ class MediaApi(private val client: HttpClient) {
             parameter("generator", "allimages")
             parameter("gaisort", "timestamp")
             parameter("gaidir", "older")
-            parameter("prop", MEDIA_PARAMS)
+            parameter("prop", "imageinfo|coordinates")
+            parameter("iiprop", "url|extmetadata|user")
+            parameter("iiurlheight", THUMB_HEIGHT_PX.toString())
+            parameter(
+                "iiextmetadatafilter",
+                "DateTime|Categories|GPSLatitude|GPSLongitude|" +
+                        "ImageDescription|DateTimeOriginal|Artist|LicenseShortName|LicenseUrl"
+            )
             
             username?.let { parameter("gaiuser", it) }
             parameter("gailimit", itemLimit.toString())
