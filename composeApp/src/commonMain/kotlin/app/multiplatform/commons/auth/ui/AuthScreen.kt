@@ -16,12 +16,12 @@ import androidx.compose.ui.unit.dp
 import app.multiplatform.commons.theme.platformThemeTarget
 import commons.composeapp.generated.resources.Res
 import commons.composeapp.generated.resources.commons_logo
-import io.github.alexzhirkevich.cupertino.CupertinoTextField
-import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveButton
-import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveCircularProgressIndicator
-import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveTheme
-import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveWidget
-import io.github.alexzhirkevich.cupertino.adaptive.ExperimentalAdaptiveApi
+import io.github.robinpcrd.cupertino.CupertinoTextField
+import io.github.robinpcrd.cupertino.adaptive.AdaptiveButton
+import io.github.robinpcrd.cupertino.adaptive.AdaptiveCircularProgressIndicator
+import io.github.robinpcrd.cupertino.adaptive.AdaptiveTheme
+import io.github.robinpcrd.cupertino.adaptive.AdaptiveWidget
+import io.github.robinpcrd.cupertino.adaptive.ExperimentalAdaptiveApi
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalAdaptiveApi::class)

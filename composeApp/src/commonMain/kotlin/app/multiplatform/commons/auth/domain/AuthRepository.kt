@@ -13,4 +13,9 @@ interface AuthRepository {
         twoFactorCode: String,
         twoFactorType: TwoFactorType,
     ): Result<ClientLoginResult, DataError.NetworkError>
+
+    suspend fun getCsrfToken(): String?
+
+    fun isLoggedIn(): Boolean
+    fun logout()
 }

@@ -19,7 +19,8 @@ data class MwQueryResponse(
 
     @Serializable
     data class Tokens(
-        val logintoken: String? = null
+        val logintoken: String? = null,
+        val csrftoken: String? = null,
     )
 
     @Serializable

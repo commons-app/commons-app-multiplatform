@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.multiplatform.commons.auth.domain.AuthRepository
 import app.multiplatform.commons.auth.ui.AuthScreen
 import app.multiplatform.commons.auth.ui.AuthViewModel
 import app.multiplatform.commons.home.ui.HomeScreen
@@ -14,8 +15,9 @@ import app.multiplatform.commons.theme.WikimediaTheme
 import app.multiplatform.commons.theme.platformThemeTarget
 import app.multiplatform.commons.upload.ui.UploadScreen
 import app.multiplatform.commons.upload.ui.UploadViewModel
-import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveTheme
+import io.github.robinpcrd.cupertino.adaptive.AdaptiveTheme
 import kotlinx.serialization.Serializable
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Serializable
@@ -36,7 +38,11 @@ fun App() {
         material = { WikimediaTheme(content = it) }
     ) {
         Surface {
-            val backstack = remember { mutableStateListOf<Route>(Route.Auth) }
+            val authRepository = koinInject<AuthRepository>()
+            val initialRoute = remember { 
+                if (authRepository.isLoggedIn()) Route.Home else Route.Auth
+            }
+            val backstack = remember { mutableStateListOf<Route>(initialRoute) }
 
             when (backstack.last()) {
                 Route.Auth -> {

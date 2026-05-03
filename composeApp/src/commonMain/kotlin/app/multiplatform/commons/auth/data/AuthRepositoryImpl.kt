@@ -3,14 +3,19 @@ package app.multiplatform.commons.auth.data
 import app.multiplatform.commons.auth.data.dto.LoginResponseDto
 import app.multiplatform.commons.auth.domain.AuthRepository
 import app.multiplatform.commons.auth.domain.models.ClientLoginResult
+import app.multiplatform.commons.auth.domain.models.LoginStatus
 import app.multiplatform.commons.auth.domain.models.TwoFactorType
 import app.multiplatform.commons.model.DataError
 import app.multiplatform.commons.model.Result
 import app.multiplatform.commons.utils.Constants
+import com.russhwolf.settings.Settings
+import com.russhwolf.settings.set
+import io.github.aakira.napier.Napier
 import io.ktor.client.call.body
 
 class AuthRepositoryImpl(
-    private val authApi: AuthApi
+    private val authApi: AuthApi,
+    private val settings: Settings
 ) : AuthRepository {
 
     override suspend fun login(username: String, password: String): Result<ClientLoginResult, DataError.NetworkError> {
@@ -38,6 +43,9 @@ class AuthRepositoryImpl(
                                 else -> null
                             }
                         }
+                    if (responseBody.clientlogin?.status == LoginStatus.PASS) {
+                        settings["username"] = username
+                    }
                     Result.Success(
                         ClientLoginResult(
                             status = responseBody.clientlogin?.status,
@@ -84,6 +92,9 @@ class AuthRepositoryImpl(
             return when (loginResponse.status.value) {
                 in 200..299 -> {
                     val responseBody = loginResponse.body<LoginResponseDto>()
+                    if (responseBody.clientlogin?.status == LoginStatus.PASS) {
+                        settings["username"] = username
+                    }
                     Result.Success(
                         ClientLoginResult(
                             responseBody.clientlogin?.status,
@@ -101,5 +112,22 @@ class AuthRepositoryImpl(
         } catch (e: Exception) {
             Result.Error(DataError.NetworkError.UNKNOWN)
         }
+    }
+
+    override suspend fun getCsrfToken(): String? {
+        return try {
+            authApi.getCsrfToken().query?.tokens?.csrftoken
+        } catch (e: Exception) {
+            Napier.e("Failed to get CSRF token", e)
+            null
+        }
+    }
+
+    override fun isLoggedIn(): Boolean {
+        return settings.getStringOrNull("username") != null
+    }
+
+    override fun logout() {
+        settings.remove("username")
     }
 }
