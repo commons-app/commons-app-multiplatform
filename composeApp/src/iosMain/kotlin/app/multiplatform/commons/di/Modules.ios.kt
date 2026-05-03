@@ -6,5 +6,5 @@ import io.ktor.client.engine.darwin.Darwin
 import org.koin.dsl.module
 
 actual val platformModule = module {
-    single<HttpClient> { createHttpClient(Darwin.create()) }
+    single<HttpClient> { createHttpClient(Darwin.create(), get()) }
 }
