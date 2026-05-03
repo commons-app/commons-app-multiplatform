@@ -89,7 +89,10 @@ fun HomeScreen(
 fun ContributionCard(item: ContributionItem) {
     OutlinedCard(
         modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )
     ) {
         Column {
             AsyncImage(
@@ -101,7 +104,7 @@ fun ContributionCard(item: ContributionItem) {
                     .clip(MaterialTheme.shapes.medium),
                 contentScale = ContentScale.Crop
             )
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(12.dp)) {
                 Text(
                     text = item.title,
                     style = MaterialTheme.typography.bodyLarge,
@@ -116,9 +119,10 @@ fun ContributionCard(item: ContributionItem) {
                 )
                 item.dateUploaded?.let { date ->
                     Text(
-                        text = date,
+                        text = date.split(" ")[0],
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.outline
+                        color = MaterialTheme.colorScheme.outline,
+                        modifier = Modifier.align(Alignment.End)
                     )
                 }
             }
