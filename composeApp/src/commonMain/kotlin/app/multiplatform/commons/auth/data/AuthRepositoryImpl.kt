@@ -127,6 +127,10 @@ class AuthRepositoryImpl(
         return settings.getStringOrNull("username") != null
     }
 
+    override fun getUsername(): String? {
+        return settings.getStringOrNull("username")
+    }
+
     override fun logout() {
         settings.remove("username")
     }
