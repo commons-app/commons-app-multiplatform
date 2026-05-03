@@ -1,7 +1,6 @@
 package app.multiplatform.commons.upload.data
 
 import app.multiplatform.commons.upload.domain.model.Contribution
-import app.multiplatform.commons.upload.ui.UploadLicense
 import app.multiplatform.commons.utils.getVersionNameWithSha
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
@@ -12,7 +11,15 @@ class PageContentsCreator {
     fun createFrom(contribution: Contribution): String = buildString {
         append("== {{int:filedesc}} ==\n")
         append("{{Information\n")
-        append("|description={{en|1=").append(contribution.description).append("}}\n")
+
+        // Only add the {{en|1=...}} wrapper when there is actual text; an empty
+        // wrapper renders the "Template:Description/i18n" error on Commons.
+        if (contribution.description.isNotBlank()) {
+            append("|description={{en|1=").append(contribution.description).append("}}\n")
+        } else {
+            append("|description=\n")
+        }
+
         append("|source={{own}}\n")
         append("|author=[[User:").append(contribution.username).append("|")
         append(contribution.username).append("]]\n")
@@ -21,21 +28,15 @@ class PageContentsCreator {
         val dateString = "${now.year}-${now.month.number.toString().padStart(2, '0')}-${now.day.toString().padStart(2, '0')}"
         append("|date=").append(dateString).append("\n")
 
-        append("}}").append("\n\n")
+        append("}}\n\n")
 
         append("== {{int:license-header}} ==\n")
-        append(licenseTemplateFor(contribution.license)).append("\n\n")
-        
+        // wikiTemplate lives on UploadLicense — single source of truth
+        append(contribution.license.wikiTemplate).append("\n\n")
+
         append("{{Uploaded from Mobile|platform=Multiplatform|version=")
         append(getVersionNameWithSha()).append("}}\n")
-        
-        // Bare minimum as requested: default to uncategorized if not provided
-        append("{{subst:unc}}")
-    }
 
-    private fun licenseTemplateFor(license: UploadLicense) = when (license) {
-        UploadLicense.CC_BY_SA_4 -> "{{self|cc-by-sa-4.0}}"
-        UploadLicense.CC_BY_4 -> "{{self|cc-by-4.0}}"
-        UploadLicense.CC0 -> "{{self|cc-zero}}"
+        append("{{subst:unc}}")
     }
 }

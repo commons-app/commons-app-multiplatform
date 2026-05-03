@@ -5,15 +5,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import app.multiplatform.commons.home.domain.model.ContributionItem
-import coil3.compose.AsyncImage
+import com.preat.peekaboo.image.picker.SelectionMode
+import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import commons.composeapp.generated.resources.Res
 import commons.composeapp.generated.resources.ic_cdx_add
 import org.jetbrains.compose.resources.painterResource
@@ -21,11 +20,15 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
-    onNavigateToUpload: () -> Unit = {},
-    viewModel: HomeViewModel = koinViewModel()
-) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+fun HomeScreen(onNavigateToUpload: (ByteArray) -> Unit = {}) {
+    val scope = rememberCoroutineScope()
+    val pickerLauncher = rememberImagePickerLauncher(
+        selectionMode = SelectionMode.Single,
+        scope = scope,
+        onResult = { byteArrays ->
+            byteArrays.firstOrNull()?.let { onNavigateToUpload(it) }
+        }
+    )
 
     Scaffold(
         topBar = {
@@ -35,8 +38,8 @@ fun HomeScreen(
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = onNavigateToUpload,
-                icon = { Icon(painterResource(Res.drawable.ic_cdx_add), contentDescription = "Upload") },
+                onClick = { pickerLauncher.launch() },
+                icon = {Icon(painterResource(Res.drawable.ic_cdx_add), contentDescription = "Upload") },
                 text = { Text("Upload") },
             )
         }
