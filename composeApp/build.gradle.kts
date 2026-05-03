@@ -73,6 +73,8 @@ kotlin {
 
             implementation(libs.okio)
             implementation(libs.napier)
+            implementation(libs.peekaboo.ui)
+            implementation(libs.peekaboo.image.picker)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

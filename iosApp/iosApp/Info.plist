@@ -4,5 +4,7 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>This app needs access to your photo library to let you upload images to Wikimedia Commons.</string>
 </dict>
 </plist>

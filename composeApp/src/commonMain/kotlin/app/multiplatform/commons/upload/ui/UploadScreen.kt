@@ -9,8 +9,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +32,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,12 +49,22 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.preat.peekaboo.image.picker.SelectionMode
+import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
+import com.preat.peekaboo.image.picker.toImageBitmap
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,6 +74,20 @@ fun UploadScreen(
     onEvent: (UploadEvent) -> Unit,
     onNavigateBack: () -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
+    var selectedImageBytes by remember { mutableStateOf<ByteArray?>(null) }
+    val imageBitmap = remember(selectedImageBytes) {
+        selectedImageBytes?.toImageBitmap()
+    }
+
+    val pickerLauncher = rememberImagePickerLauncher(
+        selectionMode = SelectionMode.Single,
+        scope = scope,
+        onResult = { byteArrays ->
+            selectedImageBytes = byteArrays.firstOrNull()
+        }
+    )
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -97,7 +124,14 @@ fun UploadScreen(
             label = "phase_transition"
         ) { phase ->
             when (phase) {
-                UploadPhase.DETAILS -> DetailsContent(uiState = uiState, onEvent = onEvent)
+                UploadPhase.DETAILS -> DetailsContent(
+                    uiState = uiState,
+                    onEvent = onEvent,
+                    onSelectImage = {
+                        pickerLauncher.launch()
+                    },
+                    imageBitmap
+                )
                 UploadPhase.UPLOADING, UploadPhase.COMPLETE -> ProgressContent(
                     uiState = uiState,
                     onEvent = onEvent,
@@ -112,6 +146,8 @@ fun UploadScreen(
 private fun DetailsContent(
     uiState: UploadUiState,
     onEvent: (UploadEvent) -> Unit,
+    onSelectImage: () -> Unit,
+    imageBitmap: ImageBitmap? = null,
 ) {
     Column(
         modifier = Modifier
@@ -120,7 +156,19 @@ private fun DetailsContent(
             .padding(horizontal = 20.dp, vertical = 20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        ImagePreviewPlaceholder()
+        if (imageBitmap != null) {
+            Image(
+                bitmap = imageBitmap,
+                contentDescription = "Selected Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(16.dp))
+            )
+        } else {
+            ImagePreviewPlaceholder(onSelectImage)
+        }
 
         OutlinedTextField(
             value = uiState.caption,
@@ -167,8 +215,9 @@ private fun DetailsContent(
 }
 
 @Composable
-private fun ImagePreviewPlaceholder() {
-    Box(
+private fun ImagePreviewPlaceholder(onClick: ()-> Unit) {
+    Card(
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .height(200.dp)
@@ -179,14 +228,24 @@ private fun ImagePreviewPlaceholder() {
                 color = MaterialTheme.colorScheme.outline,
                 shape = RoundedCornerShape(16.dp)
             ),
-        contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = "Image preview",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Text(
+                text = "Select Image",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
+}
+
+@Preview
+@Composable
+private fun ImagePreviewCard() {
+    ImagePreviewPlaceholder({})
 }
 
 @Composable
