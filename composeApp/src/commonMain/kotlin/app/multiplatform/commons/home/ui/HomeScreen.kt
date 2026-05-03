@@ -1,13 +1,14 @@
 package app.multiplatform.commons.home.ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import commons.composeapp.generated.resources.Res
+import commons.composeapp.generated.resources.ic_cdx_add
+import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -16,16 +17,12 @@ fun HomeScreen(onNavigateToUpload: () -> Unit = {}) {
         topBar = {
             TopAppBar(
                 title = { Text("Commons") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                )
             )
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = onNavigateToUpload,
-                icon = { Icon(Icons.Default.Add, contentDescription = null) },
+                icon = {Icon(painterResource(Res.drawable.ic_cdx_add), contentDescription = "Upload") },
                 text = { Text("Upload") },
             )
         }
