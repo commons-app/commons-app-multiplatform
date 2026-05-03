@@ -73,6 +73,8 @@ kotlin {
 
             implementation(libs.okio)
             implementation(libs.napier)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor)
             implementation(libs.multiplatform.settings)
             implementation(libs.multiplatform.settings.coroutines)
             implementation(libs.peekaboo.ui)
