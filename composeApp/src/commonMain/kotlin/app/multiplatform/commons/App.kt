@@ -15,7 +15,7 @@ import app.multiplatform.commons.theme.WikimediaTheme
 import app.multiplatform.commons.theme.platformThemeTarget
 import app.multiplatform.commons.upload.ui.UploadScreen
 import app.multiplatform.commons.upload.ui.UploadViewModel
-import io.github.alexzhirkevich.cupertino.adaptive.AdaptiveTheme
+import io.github.robinpcrd.cupertino.adaptive.AdaptiveTheme
 import kotlinx.serialization.Serializable
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
